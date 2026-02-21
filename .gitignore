@@ -1,0 +1,75 @@
+# Rust
+/target/
+**/*.rs.bk
+*.pdb
+Cargo.lock
+
+# Checkpoints - Large model files
+checkpoints/*.pth
+checkpoints/*.pt
+checkpoints/*.safetensors
+checkpoints/*.bin
+checkpoints/*.ckpt
+checkpoints/*.onnx
+checkpoints/**/*.pth
+checkpoints/**/*.pt
+checkpoints/**/*.safetensors
+checkpoints/**/*.bin
+checkpoints/**/*.ckpt
+checkpoints/**/*.onnx
+checkpoints/bigvgan/
+checkpoints/.cache/
+checkpoints/qwen0.6bemo4-merge/
+
+# temp_model directory
+temp_model/
+
+# Model cache
+.cache/
+.huggingface/
+.modelscope/
+
+# Test outputs
+*.wav
+output*.wav
+test*.wav
+emotion*.wav
+cloned*.wav
+designed*.wav
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Debug outputs
+debug/
+*.npy
+*.npz
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.eggs/
+venv/
+.env/
+
+# Temporary
+tmp/
+temp/
+*.tmp
+*.log
+
+# Build artifacts
+*.exe
+*.dll
+*.so
+*.dylib

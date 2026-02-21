@@ -1,0 +1,146 @@
+[package]
+name = "sdkwork-tts"
+version = "0.2.0"
+edition = "2021"
+authors = ["SDKWork Team <sdkwork@example.com>"]
+description = "A unified, extensible TTS framework supporting multiple engines (IndexTTS2, Fish-Speech, and more)"
+license = "Apache-2.0"
+repository = "https://github.com/sdkwork/sdkwork-tts"
+keywords = ["tts", "speech-synthesis", "deep-learning", "voice-cloning", "audio", "framework"]
+categories = ["multimedia::audio", "science::ml"]
+
+[dependencies]
+# ML Framework (HuggingFace Candle)
+candle-core = "0.9"
+candle-nn = "0.9"
+candle-transformers = "0.9"
+candle-flash-attn = { version = "0.9", optional = true }
+
+# Tokenization
+tokenizers = "0.22"
+
+# Audio Processing
+cpal = "0.15"                   # Cross-platform audio I/O
+rodio = "0.20"                  # Audio playback
+rubato = "0.16"                 # Sample rate conversion
+rustfft = "6.2"                 # FFT for mel spectrograms
+hound = "3.5"                   # WAV file I/O
+symphonia = { version = "0.5", features = ["mp3", "flac", "ogg"] }
+audioadapter-buffers = "2.0.0"
+
+# Configuration & Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.9"
+serde_json = "1.0"
+toml = "0.8"
+safetensors = "0.7"
+
+# Error Handling
+anyhow = "1.0"
+thiserror = "2.0"
+
+# Logging & Diagnostics
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-chrome = { version = "0.7", optional = true }
+
+# CLI
+clap = { version = "4.5", features = ["derive", "env"] }
+indicatif = "0.18"              # Progress bars
+console = "0.15"                # Terminal colors
+
+# Async Runtime
+tokio = { version = "1.42", features = ["full"] }
+tokio-stream = "0.1"
+async-trait = "0.1"
+once_cell = "1.20"
+futures = "0.3"
+
+# Parallelism
+rayon = "1.10"
+crossbeam = "0.8"
+dashmap = "5.5"
+
+# Numerics
+ndarray = "0.17"
+num-traits = "0.2"
+num-complex = "0.4"
+rand = "0.8"
+half = "2.7"
+byteorder = "1.5"
+
+# File System
+walkdir = "2.5"
+tempfile = "3.15"
+memmap2 = "0.9"
+dirs = "5.0"
+
+# HTTP (for model downloads)
+reqwest = { version = "0.12", features = ["json", "stream"] }
+
+# HuggingFace Hub
+hf-hub = "0.4"
+
+[dev-dependencies]
+criterion = "0.5"
+proptest = "1.5"
+approx = "0.5"
+insta = "1.41"
+
+[features]
+default = ["cuda"]
+cpu = []
+cuda = ["candle-core/cuda", "candle-nn/cuda", "candle-transformers/cuda"]
+metal = ["candle-core/metal", "candle-nn/metal", "candle-transformers/metal"]
+mkl = ["candle-core/mkl", "candle-nn/mkl", "candle-transformers/mkl"]
+accelerate = ["candle-core/accelerate", "candle-nn/accelerate", "candle-transformers/accelerate"]
+flash-attn = ["cuda", "dep:candle-flash-attn"]
+profiling = ["dep:tracing-chrome"]
+
+[[bin]]
+name = "qwen3-tts"
+path = "src/bin/qwen3_tts.rs"
+
+[[bin]]
+name = "sdkwork-tts"
+path = "src/main.rs"
+
+[[bin]]
+name = "diagnose_weights"
+path = "src/bin/diagnose_weights.rs"
+
+[[bin]]
+name = "test_length_regulator"
+path = "src/bin/test_length_regulator.rs"
+
+[[example]]
+name = "qwen3_tts_basic"
+path = "examples/qwen3_tts_basic.rs"
+
+[[example]]
+name = "basic_inference"
+path = "examples/basic_inference.rs"
+
+[[example]]
+name = "streaming_tts"
+path = "examples/streaming_tts.rs"
+
+[[example]]
+name = "emotion_control"
+path = "examples/emotion_control.rs"
+
+[[bench]]
+name = "inference_bench"
+harness = false
+path = "benches/inference_bench.rs"
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3
+
+[profile.dev]
+opt-level = 1
+
+[profile.bench]
+inherits = "release"
