@@ -4,38 +4,47 @@
 *.pdb
 Cargo.lock
 
-# Checkpoints - Large model files
+# Checkpoints - Large model files (DO NOT COMMIT)
 checkpoints/*.pth
 checkpoints/*.pt
 checkpoints/*.safetensors
 checkpoints/*.bin
 checkpoints/*.ckpt
 checkpoints/*.onnx
+checkpoints/*.7z
+checkpoints/*.gguf
 checkpoints/**/*.pth
 checkpoints/**/*.pt
 checkpoints/**/*.safetensors
 checkpoints/**/*.bin
 checkpoints/**/*.ckpt
 checkpoints/**/*.onnx
+checkpoints/**/*.gguf
+
+# Checkpoints - Large subdirectories
 checkpoints/bigvgan/
-checkpoints/.cache/
 checkpoints/qwen0.6bemo4-merge/
+checkpoints/maskgct/
+checkpoints/.cache/
 
 # temp_model directory
 temp_model/
 
-# Model cache
+# Model cache directories
 .cache/
 .huggingface/
 .modelscope/
 
-# Test outputs
+# Audio outputs
 *.wav
-output*.wav
-test*.wav
-emotion*.wav
-cloned*.wav
-designed*.wav
+*.mp3
+*.flac
+*.ogg
+
+# Debug outputs
+debug/
+*.npy
+*.npz
 
 # IDE
 .idea/
@@ -48,11 +57,6 @@ designed*.wav
 .DS_Store
 Thumbs.db
 
-# Debug outputs
-debug/
-*.npy
-*.npz
-
 # Python
 __pycache__/
 *.pyc
@@ -61,6 +65,7 @@ __pycache__/
 .eggs/
 venv/
 .env/
+.venv/
 
 # Temporary
 tmp/
@@ -69,7 +74,6 @@ temp/
 *.log
 
 # Build artifacts
-*.exe
 *.dll
 *.so
 *.dylib
