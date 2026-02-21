@@ -1,0 +1,202 @@
+# GitHub Actions CI/CD for SDKWork-TTS
+
+name: CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_VERSION: 1.75
+
+jobs:
+  # ============================================
+  # Test Job
+  # ============================================
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+      
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      
+      - name: Run tests
+        run: cargo test --lib --no-default-features --features cpu
+      
+      - name: Run clippy
+        run: cargo clippy --no-default-features --features cpu -- -D warnings
+      
+      - name: Check formatting
+        run: cargo fmt -- --check
+
+  # ============================================
+  # Build Job
+  # ============================================
+  build:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    needs: test
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            artifact_name: sdkwork-tts-linux
+          - os: windows-latest
+            artifact_name: sdkwork-tts-windows.exe
+          - os: macos-latest
+            artifact_name: sdkwork-tts-macos
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+      
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      
+      - name: Build release
+        run: cargo build --release --no-default-features --features cpu
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: target/release/${{ matrix.os == 'windows-latest' && 'sdkwork-tts.exe' || 'sdkwork-tts' }}
+
+  # ============================================
+  # Docker Build Job
+  # ============================================
+  docker:
+    name: Build Docker
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        if: github.event_name == 'push'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha
+      
+      - name: Build and push CPU image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          target: runtime
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ steps.meta.outputs.tags }}-cpu
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/amd64
+      
+      - name: Build and push GPU image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.gpu
+          target: runtime
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ steps.meta.outputs.tags }}-gpu
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/amd64
+
+  # ============================================
+  # Release Job
+  # ============================================
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: [test, build]
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      
+      - name: Create release archives
+        run: |
+          cd artifacts
+          zip -r sdkwork-tts-linux.zip sdkwork-tts-linux/
+          zip -r sdkwork-tts-windows.zip sdkwork-tts-windows/
+          zip -r sdkwork-tts-macos.zip sdkwork-tts-macos/
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/sdkwork-tts-linux.zip
+            artifacts/sdkwork-tts-windows.zip
+            artifacts/sdkwork-tts-macos.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ============================================
+  # Deploy Job
+  # ============================================
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: release
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to production
+        run: |
+          echo "Deploying to production..."
+          # Add your deployment commands here
+          # Example: kubectl apply -f k8s/
+          # Example: ssh user@server "cd /opt/tts && docker compose pull && docker compose up -d"

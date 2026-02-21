@@ -307,7 +307,7 @@ impl ConfigCenter {
     pub fn watch(&self, key: &str, watcher: ConfigWatcher) {
         self.watchers
             .entry(key.to_string())
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(watcher);
     }
 

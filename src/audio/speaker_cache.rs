@@ -129,8 +129,10 @@ impl SpeakerEmbeddingCache {
 
     /// Create a disabled cache (no caching)
     pub fn disabled() -> Self {
-        let mut config = SpeakerCacheConfig::default();
-        config.enabled = false;
+        let config = SpeakerCacheConfig {
+            enabled: false,
+            ..Default::default()
+        };
         Self::new(config)
     }
 

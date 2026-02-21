@@ -169,7 +169,7 @@ impl OptimizedInferenceEngine {
     pub fn infer_with_profile(
         &self,
         text: &str,
-        gen_config: &GenerationConfig,
+        _gen_config: &GenerationConfig,
     ) -> Result<(QwenSynthesisResult, Option<InferenceProfile>)> {
         let total_start = Instant::now();
 

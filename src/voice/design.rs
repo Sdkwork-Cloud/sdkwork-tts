@@ -9,7 +9,7 @@
 use std::collections::HashMap;
 
 /// Voice design configuration
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct VoiceDesignConfig {
     /// Natural language description of the voice
     pub description: String,
@@ -29,22 +29,6 @@ pub struct VoiceDesignConfig {
     pub speaking_rate: Option<f32>,
     /// Additional characteristics
     pub characteristics: Vec<String>,
-}
-
-impl Default for VoiceDesignConfig {
-    fn default() -> Self {
-        Self {
-            description: String::new(),
-            gender: None,
-            age_range: None,
-            timbre: None,
-            pitch: None,
-            emotion: None,
-            accent: None,
-            speaking_rate: None,
-            characteristics: Vec::new(),
-        }
-    }
 }
 
 impl VoiceDesignConfig {

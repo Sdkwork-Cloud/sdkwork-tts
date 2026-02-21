@@ -125,7 +125,7 @@ impl TextNormalizer {
                     result.push_str(&words);
                 } else {
                     // Fallback: keep original
-                    for j in start..i {
+                    for (j, _ch) in chars.iter().enumerate().take(i).skip(start) {
                         result.push(chars[j]);
                     }
                 }

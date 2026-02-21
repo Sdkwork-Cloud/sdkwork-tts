@@ -178,6 +178,7 @@ impl EmotionType {
     }
 
     /// Parse from string
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Option<Self> {
         let s = s.to_lowercase();
         match s.as_str() {

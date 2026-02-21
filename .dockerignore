@@ -1,0 +1,21 @@
+# Docker build context
+target/
+*.pdb
+checkpoints/*.bin
+checkpoints/*.pth
+checkpoints/*.safetensors
+speaker_library/**/*.wav
+.git
+.gitignore
+*.md
+!README.md
+docs/
+tests/
+benches/
+examples/
+scripts/
+*.ps1
+*.bat
+!.dockerignore
+Dockerfile*
+docker-compose*.yml

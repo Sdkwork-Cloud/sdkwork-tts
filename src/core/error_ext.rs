@@ -783,21 +783,21 @@ impl RecoveryExecutor {
 
         match primary() {
             Ok(value) => {
-                return RecoveryResult::success(value, 1, start.elapsed().as_millis() as u64);
+                RecoveryResult::success(value, 1, start.elapsed().as_millis() as u64)
             }
             Err(e) => {
                 tracing::warn!("Primary operation failed: {}. Trying fallback...", e);
                 
                 match fallback() {
                     Ok(value) => {
-                        return RecoveryResult::success(value, 2, start.elapsed().as_millis() as u64);
+                    RecoveryResult::success(value, 2, start.elapsed().as_millis() as u64)
                     }
                     Err(e) => {
-                        return RecoveryResult::failure(
+                        RecoveryResult::failure(
                             format!("Primary: {}, Fallback: {}", e, e),
                             2,
                             start.elapsed().as_millis() as u64,
-                        );
+                        )
                     }
                 }
             }

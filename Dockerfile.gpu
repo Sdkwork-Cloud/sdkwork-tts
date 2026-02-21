@@ -1,0 +1,80 @@
+# TTS Server Docker Image - GPU Version
+# Requires NVIDIA GPU with CUDA support
+
+# ============================================
+# Stage 1: Builder
+# ============================================
+FROM nvidia/cuda:12.2.0-devel-ubuntu22.04 as builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    cmake \
+    pkg-config \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# Set working directory
+WORKDIR /app
+
+# Copy source files
+COPY Cargo.toml Cargo.lock ./
+COPY src/ ./src/
+
+# Set CUDA compute capability (adjust for your GPU)
+# RTX 3090/4090 = 89, RTX 3080 = 86, RTX 2080 = 75
+ENV CUDA_COMPUTE_CAP=89
+
+# Build in release mode with CUDA
+RUN cargo build --release --features cuda
+
+# ============================================
+# Stage 2: Runtime
+# ============================================
+FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04 as runtime
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    libssl3 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN groupadd -r tts && useradd -r -g tts tts
+
+# Set working directory
+WORKDIR /app
+
+# Copy binary from builder
+COPY --from=builder /app/target/release/sdkwork-tts /usr/local/bin/
+
+# Create directories for data
+RUN mkdir -p /app/checkpoints /app/speaker_library /app/config && \
+    chown -R tts:tts /app
+
+# Switch to non-root user
+USER tts
+
+# Expose port
+EXPOSE 8080
+
+# Set environment variables
+ENV RUST_LOG=info
+ENV MODE=local
+ENV PORT=8080
+ENV HOST=0.0.0.0
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Entry point
+ENTRYPOINT ["sdkwork-tts", "server"]
+
+# Default arguments
+CMD ["--mode", "local", "--port", "8080"]

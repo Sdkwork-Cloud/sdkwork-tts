@@ -102,8 +102,10 @@ impl TtsEngine for IndexTTS2Engine {
             });
         }
 
-        let mut inference_config = InferenceConfig::default();
-        inference_config.use_gpu = config.device.use_gpu;
+        let inference_config = InferenceConfig {
+            use_gpu: config.device.use_gpu,
+            ..Default::default()
+        };
 
         let mut tts = IndexTTS2::with_config(&config_path, inference_config)?;
         
@@ -231,7 +233,7 @@ impl TtsEngine for IndexTTS2Engine {
         let result = self.synthesize(request).await?;
         
         let chunk_size = 4096;
-        let total_chunks = (result.audio.len() + chunk_size - 1) / chunk_size;
+        let total_chunks = result.audio.len().div_ceil(chunk_size);
         
         for (i, chunk_start) in (0..result.audio.len()).step_by(chunk_size).enumerate() {
             let chunk_end = (chunk_start + chunk_size).min(result.audio.len());

@@ -93,6 +93,7 @@ pub mod hub;
 pub mod inference;
 pub mod models;
 pub mod sdk;
+pub mod server;
 pub mod streaming;
 pub mod text;
 pub mod utils;

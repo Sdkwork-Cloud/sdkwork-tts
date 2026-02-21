@@ -16,6 +16,7 @@ use tracing_subscriber::FmtSubscriber;
 use sdkwork_tts::{IndexTTS2, ModelConfig, VERSION};
 use sdkwork_tts::inference::{InferenceConfig, Qwen3Tts, QwenInferenceConfig, QwenModelVariant};
 use sdkwork_tts::engine::{global_registry, init_engines};
+use sdkwork_tts::server::{TtsServer, ServerConfig};
 
 /// Available TTS engines
 #[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
@@ -86,6 +87,25 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    /// Start TTS server
+    Server {
+        /// Server host
+        #[arg(long, default_value = "0.0.0.0")]
+        host: String,
+        
+        /// Server port
+        #[arg(long, default_value = "8080")]
+        port: u16,
+        
+        /// Server mode (local, cloud, hybrid)
+        #[arg(long, default_value = "local")]
+        mode: String,
+        
+        /// Configuration file path
+        #[arg(short, long)]
+        config: Option<PathBuf>,
+    },
+    
     /// Synthesize speech from text
     Infer {
         /// TTS engine to use
@@ -554,6 +574,52 @@ fn main() -> Result<()> {
     info!("SDKWork-TTS v{}", VERSION);
 
     match &cli.command {
+        Commands::Server { host, port, mode, config } => {
+            info!("Starting TTS server...");
+            info!("  Host: {}", host);
+            info!("  Port: {}", port);
+            info!("  Mode: {}", mode);
+            
+            // Load or create config
+            let mut server_config = if let Some(config_path) = config {
+                ServerConfig::load(config_path).unwrap_or_else(|e| {
+                    warn!("Failed to load config: {}, using default", e);
+                    ServerConfig::default()
+                })
+            } else {
+                ServerConfig::default()
+            };
+            
+            // Override with CLI args
+            server_config.host = host.clone();
+            server_config.port = *port;
+            
+            // Set mode
+            server_config.mode = match mode.as_str() {
+                "cloud" => sdkwork_tts::server::config::ServerMode::Cloud,
+                "hybrid" => sdkwork_tts::server::config::ServerMode::Hybrid,
+                _ => sdkwork_tts::server::config::ServerMode::Local,
+            };
+            
+            // Create and run server
+            let server = TtsServer::new(server_config);
+            
+            info!("Server starting on http://{}:{}", host, port);
+            info!("API docs: http://{}:{}/docs", host, port);
+            
+            // Run server in blocking mode
+            let rt = tokio::runtime::Runtime::new().unwrap();
+            rt.block_on(async {
+                if let Err(e) = server.run().await {
+                    tracing::error!("Server failed: {}", e);
+                    return Err::<(), anyhow::Error>(e.into());
+                }
+                Ok(())
+            })?;
+            
+            Ok(())
+        }
+
         Commands::Infer {
             engine,
             text,

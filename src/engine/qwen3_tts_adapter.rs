@@ -331,7 +331,7 @@ impl TtsEngine for Qwen3TtsEngine {
         let result = self.synthesize(request).await?;
 
         let chunk_size = 4096;
-        let total_chunks = (result.audio.len() + chunk_size - 1) / chunk_size;
+        let total_chunks = result.audio.len().div_ceil(chunk_size);
 
         for (i, chunk_start) in (0..result.audio.len()).step_by(chunk_size).enumerate() {
             let chunk_end = (chunk_start + chunk_size).min(result.audio.len());

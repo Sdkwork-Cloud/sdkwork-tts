@@ -267,6 +267,7 @@ impl StreamHandle {
     }
 
     /// Iterate over all chunks
+    #[allow(clippy::should_implement_trait)]
     pub fn into_iter(self) -> StreamIterator {
         StreamIterator { handle: self }
     }

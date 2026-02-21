@@ -1,0 +1,93 @@
+# TTS Server Configuration
+# 服务器配置文件
+
+# 服务器模式：local, cloud, hybrid
+mode: local
+
+# 服务器地址和端口
+host: "0.0.0.0"
+port: 8080
+
+# Local 模式配置
+local:
+  enabled: true
+  checkpoints_dir: "checkpoints"
+  default_engine: "indextts2"
+  use_gpu: true
+  use_fp16: false
+  batch_size: 4
+  max_concurrent: 10
+
+# Cloud 模式配置
+cloud:
+  enabled: false
+  default_channel: null
+  channels:
+    # 阿里云
+    - name: aliyun
+      type: aliyun
+      api_key: "${ALIYUN_API_KEY}"  # 使用环境变量
+      api_secret: null
+      app_id: null
+      base_url: null
+      models:
+        - tts-v1
+      default_model: tts-v1
+      timeout: 30
+      retries: 3
+    
+    # OpenAI
+    - name: openai
+      type: openai
+      api_key: "${OPENAI_API_KEY}"
+      models:
+        - tts-1
+        - tts-1-hd
+      default_model: tts-1
+      timeout: 30
+      retries: 3
+    
+    # 火山引擎
+    - name: volcano
+      type: volcano
+      api_key: "${VOLCANO_API_KEY}"
+      api_secret: "${VOLCANO_API_SECRET}"
+      app_id: "${VOLCANO_APP_ID}"
+      models:
+        - fullspeech
+      default_model: fullspeech
+      timeout: 30
+      retries: 3
+    
+    # Minimax
+    - name: minimax
+      type: minimax
+      api_key: "${MINIMAX_API_KEY}"
+      models:
+        - speech-01-tts
+      default_model: speech-01-tts
+      timeout: 30
+      retries: 3
+
+# Speaker 库配置
+speaker_lib:
+  enabled: true
+  local_path: "speaker_library"
+  cloud_enabled: false
+  auto_sync: false
+  max_cache_size: 1000
+
+# 认证配置
+auth:
+  enabled: false
+  api_key: null  # 设置 API Key
+  jwt_secret: null  # 设置 JWT 密钥
+  token_expiry: 24  # Token 过期时间 (小时)
+
+# 日志配置
+logging:
+  level: "info"  # trace, debug, info, warn, error
+  file: null  # 日志文件路径
+  rotation_size: 100  # 日志轮转大小 (MB)
+  keep_files: 5  # 保留的日志文件数
+  access_log: true  # 启用访问日志

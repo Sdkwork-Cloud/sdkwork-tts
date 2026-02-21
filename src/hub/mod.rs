@@ -36,10 +36,10 @@
 //! let model_path = manager.get_model_with_hub("Qwen/Qwen3-TTS", HubType::ModelScope).await?;
 //! ```
 
-mod hub;
+mod hub_core;
 mod registry;
 
-pub use hub::{HubType, HubConfig, ModelSource};
+pub use hub_core::{HubType, HubConfig, ModelSource};
 pub use registry::{ModelRegistry, ModelInfo};
 
 use std::path::PathBuf;

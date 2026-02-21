@@ -8,10 +8,12 @@
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-48%20passed-green.svg)]()
 [![Engines](https://img.shields.io/badge/Engines-3%20supported-blue.svg)]()
+[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)]()
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-automated-green.svg)]()
 
 **支持引擎:** IndexTTS2 | Qwen3-TTS | Fish-Speech
 
-[快速开始](#-快速开始) • [文档](#-文档) • [示例](#-示例) • [性能](#-性能)
+[快速开始](#-快速开始) • [文档](#-文档) • [示例](#-示例) • [性能](#-性能) • [部署](#-部署)
 
 </div>
 

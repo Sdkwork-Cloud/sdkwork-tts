@@ -265,7 +265,7 @@ impl MetricsCollector {
 
         self.timers
             .entry(name.to_string())
-            .or_insert_with(TimerStats::default)
+            .or_default()
             .record(duration);
         Ok(())
     }
