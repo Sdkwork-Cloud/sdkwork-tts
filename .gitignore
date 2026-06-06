@@ -77,3 +77,13 @@ temp/
 *.dll
 *.so
 *.dylib
+
+# SDKWork local environment and runtime config overrides
+.env.local
+.env.development.local
+.env.test.local
+.env.staging.local
+.env.production.local
+.env.postgres
+.env.release.local
+config/*.local.toml
