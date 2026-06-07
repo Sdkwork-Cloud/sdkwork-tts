@@ -25,7 +25,7 @@ nvcc --version
 ### 2. 克隆项目
 
 ```bash
-cd D:\sdkwork-opensource\indextts2-rust
+cd sdkwork-tts
 ```
 
 ### 3. 构建项目

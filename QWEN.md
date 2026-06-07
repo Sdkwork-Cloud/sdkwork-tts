@@ -90,7 +90,7 @@ cargo bench
 ## 项目结构
 
 ```
-D:\sdkwork-opensource\indextts2-rust\
+sdkwork-tts/
 ├── src/
 │   ├── main.rs                  # CLI 入口点
 │   ├── lib.rs                   # 库导出
