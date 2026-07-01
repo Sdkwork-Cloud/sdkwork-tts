@@ -1,4 +1,5 @@
 # SDKWork-TTS
+repository-kind: application
 
 <div align="center">
 
