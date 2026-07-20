@@ -1,0 +1,9 @@
+{
+  "kind": "sdkwork.api.assembly",
+  "schemaVersion": 1,
+  "applicationCode": "tts",
+  "apiMode": "none",
+  "packageName": "sdkwork-api-tts-assembly",
+  "crateDir": "crates/sdkwork-api-tts-assembly",
+  "routeCrates": []
+}
