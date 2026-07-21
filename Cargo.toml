@@ -1,10 +1,10 @@
-[package]
+﻿[package]
 name = "sdkwork-tts"
 version = "0.2.0"
 edition = "2021"
 authors = ["SDKWork Team <sdkwork@example.com>"]
 description = "A unified, extensible TTS framework supporting multiple engines (IndexTTS2, Fish-Speech, and more)"
-license = "Apache-2.0"
+license = "AGPL-3.0-or-later"
 repository = "https://github.com/sdkwork/sdkwork-tts"
 keywords = ["tts", "speech-synthesis", "deep-learning", "voice-cloning", "audio", "framework"]
 categories = ["multimedia::audio", "science::ml"]
